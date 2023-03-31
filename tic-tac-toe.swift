@@ -1,59 +1,69 @@
-// 定义一个二维数组作为井字棋棋盘
-var board = [[String]](repeating: [String](repeating: " ", count: 3), count: 3)
+// Define a 3x3 game board as a nested array
+var gameBoard = [[String]](repeating: [String](repeating: "-", count: 3), count: 3)
 
-// 定义一个变量来表示当前玩家
-var currentPlayer = "X"
-
-// 定义一个函数来打印棋盘
-func printBoard() {
-    for i in 0..<3 {
-        for j in 0..<3 {
-            print(board[i][j], terminator: "")
-            if j != 2 {
-                print("|", terminator: "")
-            }
-        }
-        print("")
-        if i != 2 {
-            print("-----")
-        }
+// Define a function to print the game board
+func printGameBoard() {
+    for row in gameBoard {
+        print(row.joined(separator: " "))
     }
 }
 
-// 定义一个函数来检查是否有玩家获胜
-func checkForWin() -> Bool {
-    // 检查每一行
-    for i in 0..<3 {
-        if board[i][0] != " " && board[i][0] == board[i][1] && board[i][1] == board[i][2] {
+// Define a function to check if a player has won
+func checkWin(player: String) -> Bool {
+    // Check rows
+    for row in gameBoard {
+        if row == [player, player, player] {
             return true
         }
     }
-    
-    // 检查每一列
+    // Check columns
     for i in 0..<3 {
-        if board[0][i] != " " && board[0][i] == board[1][i] && board[1][i] == board[2][i] {
+        if gameBoard[0][i] == player && gameBoard[1][i] == player && gameBoard[2][i] == player {
             return true
         }
     }
-    
-    // 检查对角线
-    if board[0][0] != " " && board[0][0] == board[1][1] && board[1][1] == board[2][2] {
+    // Check diagonals
+    if gameBoard[0][0] == player && gameBoard[1][1] == player && gameBoard[2][2] == player {
         return true
     }
-    if board[0][2] != " " && board[0][2] == board[1][1] && board[1][1] == board[2][0] {
+    if gameBoard[0][2] == player && gameBoard[1][1] == player && gameBoard[2][0] == player {
         return true
     }
-    
-    // 如果没有玩家获胜，则返回 false
+    // No win condition met
     return false
 }
 
-// 定义一个变量来表示游戏是否结束
-var gameOver = false
+// Define a variable to keep track of the current player
+var currentPlayer = "X"
 
-// 开始游戏循环
-while !gameOver {
-    // 打印当前棋盘
-    printBoard()
-    
-    // 提示当前玩家落子
+// Define a loop to keep playing until someone wins or the board is full
+while true {
+    // Print the game board
+    printGameBoard()
+    // Ask the current player to make a move
+    print("Player \(currentPlayer), make your move (row column):")
+    let input = readLine()!.split(separator: " ").map { Int($0)! }
+    let row = input[0]
+    let col = input[1]
+    // Check if the move is valid
+    if gameBoard[row][col] != "-" {
+        print("Invalid move, try again.")
+        continue
+    }
+    // Update the game board with the move
+    gameBoard[row][col] = currentPlayer
+    // Check if the current player has won
+    if checkWin(player: currentPlayer) {
+        printGameBoard()
+        print("Player \(currentPlayer) wins!")
+        break
+    }
+    // Check if the game is a tie
+    if !gameBoard.joined().contains("-") {
+        printGameBoard()
+        print("Game ends in a tie!")
+        break
+    }
+    // Switch to the other player
+    currentPlayer = currentPlayer == "X" ? "O" : "X"
+}
